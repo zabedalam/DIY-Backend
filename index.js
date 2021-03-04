@@ -1,9 +1,8 @@
 const express=require('express')
-const uuid=require('uuidv4')
-const stripe =require("stripe")("")
+require("dotenv").config()
 const cors =require("cors")
 const morgan=require("morgan")
-require("dotenv").config()
+
 
 const app=express()
 
