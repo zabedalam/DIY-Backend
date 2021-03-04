@@ -1,7 +1,7 @@
 "use strict";
 var express = require('express');
 var uuid = require('uuidv4');
-var stripe = require("stripe")("");
+// var stripe = require("stripe")("");
 var cors = require("cors");
 var morgan = require("morgan");
 require("dotenv").config();

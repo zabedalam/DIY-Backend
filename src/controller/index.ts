@@ -1,4 +1,5 @@
 import {v4 as uuid} from "uuid"
+require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 type  validType=number | string 
