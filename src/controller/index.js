@@ -4,20 +4,20 @@ var uuid_1 = require("uuid");
 require("dotenv").config();
 var stripe = require("stripe")(process.env.STRIPE_KEY);
 exports.stripePayment = function (req, res) {
-    var _a = req.body, donation = _a.donation, token = _a.token;
+    var _a = req.body, product = _a.product, token = _a.token;
     var idempontencyKey = uuid_1.v4();
-    return stripe.donars
+    return stripe.customers
         .create({
         email: token.email,
         source: token.id
     })
-        .then(function (donar) {
+        .then(function (customer) {
         stripe.charges.create({
-            amount: donation.price * 100,
+            amount: product.price * 100,
             currency: "usd",
-            donar: donar.id,
+            donar: customer.id,
             receipt_email: token.email,
-            description: "Donation of " + donation.name,
+            description: "Donation of " + product.name,
             shipping: {
                 name: token.card.name,
                 address: {

@@ -19,23 +19,23 @@ type userType={
   id:string
 }
 exports.stripePayment = (req:any, res:any):objectType => {
-  const { donation, token } = req.body;
+  const { product, token } = req.body;
   const idempontencyKey = uuid();
 
-  return stripe.donars
+  return stripe.customers
     .create({
       email: token.email,
       source: token.id
     })
-    .then((donar:userType) => {
+    .then((customer:userType) => {
         
       stripe.charges.create(
         {
-          amount: donation.price * 100,
+          amount: product.price * 100,
           currency: "usd",
-          donar: donar.id,
+          donar: customer.id,
           receipt_email: token.email,
-          description: `Donation of ${donation.name}`,
+          description: `Donation of ${product.name}`,
           shipping: {
             name: token.card.name,
             address: {
