@@ -1,5 +1,6 @@
 "use strict";
-var router = require("express").Router();
+// const express = require("express");
+var routerPay = require("express").Router();
 var stripePayment = require("../controller").stripePayment;
-router.post("/", stripePayment);
-module.exports = router;
+routerPay.post("/", stripePayment);
+module.exports = routerPay;

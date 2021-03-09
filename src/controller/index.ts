@@ -1,56 +1,39 @@
-import {v4 as uuid} from "uuid"
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
-type  validType=number | string 
-type objectType={
-  body:{
-        donation:number,
-        token:string,
-        
-        
-      }
+exports.stripePayment = async (req: any, res: any) => {
+  const { email } = req.body;
 
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: 5000,
+    currency: "usd",
+    metadata: { integration_check: "accept_a_payment" },
+    receipt_email: email
+  });
+
+  res.json({ client_secret: paymentIntent["client_secret"] });
+};
+
+exports.stripeSubscription = async (req: any, res: any) => {
+  const { email, payment_method } = req.body;
+
+  const customer = await stripe.customers.create({
+    payment_method: payment_method,
+    email: email,
+    invoice_settings: {
+      default_payment_method: payment_method
     }
+  });
 
-type userType={
-  name:string,
-  email:string,
-  id:string
-}
-exports.stripePayment = (req:any, res:any):objectType => {
-  const { product, token } = req.body;
-  const idempontencyKey = uuid();
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ plan: "price_1IT5CGG6np2P9MdlAPbEdxjP" }],
+    expand: ["latest_invoice.payment_intent"]
+  });
 
-  return stripe.customers
-    .create({
-      email: token.email,
-      source: token.id
-    })
-    .then((customer:userType) => {
-        
-      stripe.charges.create(
-        {
-          amount: product.price * 100,
-          currency: "usd",
-          donar: customer.id,
-          receipt_email: token.email,
-          description: `Donation of ${product.name}`,
-          shipping: {
-            name: token.card.name,
-            address: {
-              country: token.card.address_country
-            }
-          }
-        },
-        { idempontencyKey }
-      );
-    })
-    .then((result:validType) => res.status(200).json(result))
-    .catch((e:objectType) => {
-      console.log(e);
-      res.json({
-        message: "Error Occurred"
-      });
-    });
+  const status = subscription["latest_invoice"]["payment_intent"]["status"];
+  const client_secret =
+    subscription["latest_invoice"]["payment_intent"]["client_secret"];
+
+  res.json({ client_secret: client_secret, status: status });
 };

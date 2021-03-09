@@ -1,10 +1,14 @@
 const express=require('express')
 const uuid=require('uuidv4')
-const stripe =require("stripe")("")
 const cors =require("cors")
 const morgan=require("morgan")
-const postRoute=require("./src/routes")
-require("dotenv").config()
+const payRoute=require("./src/routes")
+const subRoute=require("./src/routes/subscription")
+
+require("dotenv").config();
+const stripeVal = require("stripe")(process.env.STRIPE_KEY);
+
+
 
 const app=express()
 
@@ -12,9 +16,11 @@ const app=express()
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
-app.use("/payment",postRoute)
+app.use("/stripePayment",payRoute)
+app.use("/stripeSubscription",subRoute)
 
-// routes
+
+
 app.get("/",(req:any,res:any)=>{
     res.send("Welcome to DIY Foundation")
 })

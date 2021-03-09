@@ -1,7 +1,8 @@
-const router=require("express").Router();
+// const express = require("express");
+const routerPay=require("express").Router();
 const {stripePayment}=require("../controller")
 
-router.post("/",stripePayment)
+routerPay.post("/",stripePayment)
 
 
-module.exports=router
+module.exports=routerPay
