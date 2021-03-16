@@ -2,24 +2,40 @@ require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 exports.stripePayment = async (req: any, res: any) => {
-  const { email } = req.body;
+  const {email, name } = req.body;
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: 5000,
-    currency: "usd",
-    metadata: { integration_check: "accept_a_payment" },
-    receipt_email: email
-  });
+  if (true) { // Data is valid!
+    try {
+      // Create a PI:
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 5000, // In cents
+        currency: 'usd',
+        receipt_email: email,
+      });
+      // res.render('card', {name: name,  intentSecret: paymentIntent.client_secret });
+      res.json({ name: name,client_secret: paymentIntent["client_secret"]});
+    } catch(err) {
+      console.log('Error! ', err.message);
+    }
+  } 
 
-  res.json({ client_secret: paymentIntent["client_secret"] });
+  // const paymentIntent = await stripe.paymentIntents.create({
+  //   amount: 5000,
+  //   currency: "usd",
+  //   metadata: { integration_check: "accept_a_payment" },
+  //   receipt_email: email,
+  // });
+
+  // res.json({ client_secret: paymentIntent["client_secret"] });
 };
 
 exports.stripeSubscription = async (req: any, res: any) => {
-  const { email, payment_method } = req.body;
+  const { email,name, payment_method } = req.body;
 
   const customer = await stripe.customers.create({
     payment_method: payment_method,
     email: email,
+    name:name,
     invoice_settings: {
       default_payment_method: payment_method
     }

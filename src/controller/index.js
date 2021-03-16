@@ -35,66 +35,62 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-// import {v4 as uuid} from "uuid"
 require("dotenv").config();
 var stripe = require("stripe")(process.env.STRIPE_KEY);
-// type  validType=number | string 
-// type objectType={
-//   body:{
-//         donation:number,
-//         token:string,
-//       }
-//     }
-// type userType={
-//   name:string,
-//   email:string,
-//   id:string
-// }
 exports.stripePayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var email, paymentIntent;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var _a, email, name, paymentIntent, err_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                email = req.body.email;
+                _a = req.body, email = _a.email, name = _a.name;
+                if (!true) return [3 /*break*/, 4];
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, stripe.paymentIntents.create({
                         amount: 5000,
                         currency: 'usd',
-                        // Verify your integration in this guide by including this parameter
-                        metadata: { integration_check: 'accept_a_payment' },
                         receipt_email: email,
                     })];
-            case 1:
-                paymentIntent = _a.sent();
-                res.json({ 'client_secret': paymentIntent['client_secret'] });
-                return [2 /*return*/];
+            case 2:
+                paymentIntent = _b.sent();
+                // res.render('card', {name: name,  intentSecret: paymentIntent.client_secret });
+                res.json({ name: name, client_secret: paymentIntent["client_secret"] });
+                return [3 /*break*/, 4];
+            case 3:
+                err_1 = _b.sent();
+                console.log('Error! ', err_1.message);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
 exports.stripeSubscription = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, email, payment_method, customer, subscription, status, client_secret;
+    var _a, email, name, payment_method, customer, subscription, status, client_secret;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.body, email = _a.email, payment_method = _a.payment_method;
+                _a = req.body, email = _a.email, name = _a.name, payment_method = _a.payment_method;
                 return [4 /*yield*/, stripe.customers.create({
                         payment_method: payment_method,
                         email: email,
+                        name: name,
                         invoice_settings: {
-                            default_payment_method: payment_method,
-                        },
+                            default_payment_method: payment_method
+                        }
                     })];
             case 1:
                 customer = _b.sent();
                 return [4 /*yield*/, stripe.subscriptions.create({
                         customer: customer.id,
-                        items: [{ plan: 'price_1IT5CGG6np2P9MdlAPbEdxjP' }],
-                        expand: ['latest_invoice.payment_intent']
+                        items: [{ plan: "price_1IT5CGG6np2P9MdlAPbEdxjP" }],
+                        expand: ["latest_invoice.payment_intent"]
                     })];
             case 2:
                 subscription = _b.sent();
-                status = subscription['latest_invoice']['payment_intent']['status'];
-                client_secret = subscription['latest_invoice']['payment_intent']['client_secret'];
-                res.json({ 'client_secret': client_secret, 'status': status });
+                status = subscription["latest_invoice"]["payment_intent"]["status"];
+                client_secret = subscription["latest_invoice"]["payment_intent"]["client_secret"];
+                res.json({ client_secret: client_secret, status: status });
                 return [2 /*return*/];
         }
     });
